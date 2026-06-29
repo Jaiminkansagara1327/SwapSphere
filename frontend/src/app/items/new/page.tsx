@@ -97,8 +97,8 @@ export default function NewItem() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen bg-zinc-950 flex-col items-center justify-center text-zinc-500 gap-2">
-        <RefreshCw className="h-6 w-6 animate-spin text-violet-500" />
+      <div className="flex min-h-screen bg-zinc-50 flex-col items-center justify-center text-zinc-500 gap-2">
+        <RefreshCw className="h-6 w-6 animate-spin text-zinc-850" />
         <span className="text-xs">Authenticating session...</span>
       </div>
     );
@@ -107,14 +107,14 @@ export default function NewItem() {
   if (!user) return null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="flex flex-col min-h-screen bg-zinc-50 text-zinc-900">
       <Navbar />
 
       <main className="flex-1 mx-auto max-w-2xl px-4 py-8 sm:px-6 w-full z-10">
         {/* Back Link */}
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors mb-6"
+          className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 transition-colors mb-6"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to Marketplace
@@ -122,27 +122,27 @@ export default function NewItem() {
 
         {/* Title */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <PlusCircle className="h-5.5 w-5.5 text-violet-400" />
+          <h1 className="text-2xl font-bold flex items-center gap-2 text-zinc-900">
+            <PlusCircle className="h-5.5 w-5.5 text-zinc-900" />
             <span>List an Item for Swap</span>
           </h1>
-          <p className="text-xs text-zinc-400 mt-1">
+          <p className="text-xs text-zinc-500 mt-1">
             Fill in the details below to upload a item and put it in the SwapSphere marketplace.
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-xs text-red-400">
+          <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 p-4 text-xs text-red-650">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6 bg-zinc-900/30 border border-zinc-800 p-6 rounded-2xl backdrop-blur-md">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-zinc-200 p-6 rounded-2xl shadow-sm">
           {/* Title */}
           <div>
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">
               Item Title
             </label>
             <input
@@ -151,20 +151,20 @@ export default function NewItem() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Mechanical Keyboard, Introduction to Algorithms Book"
-              className="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-4 py-3 text-xs text-zinc-100 placeholder-zinc-650 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+              className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3 text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950"
             />
           </div>
 
           {/* Category & Condition Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">
                 Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3.5 text-xs text-zinc-800 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 cursor-pointer"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -174,13 +174,13 @@ export default function NewItem() {
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">
                 Condition
               </label>
               <select
                 value={condition}
                 onChange={(e) => setCondition(e.target.value)}
-                className="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3.5 text-xs text-zinc-800 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 cursor-pointer"
               >
                 {CONDITIONS.map((cond) => (
                   <option key={cond} value={cond}>
@@ -193,7 +193,7 @@ export default function NewItem() {
 
           {/* Description */}
           <div>
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">
               Description
             </label>
             <textarea
@@ -202,13 +202,13 @@ export default function NewItem() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe the item's features, usability, and any potential wear and tear."
-              className="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-4 py-3 text-xs text-zinc-100 placeholder-zinc-650 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 resize-none"
+              className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3.5 text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 resize-none"
             />
           </div>
 
           {/* Preferred Trade */}
           <div>
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">
               What do you want in exchange? (Preferred Trade)
             </label>
             <input
@@ -216,18 +216,18 @@ export default function NewItem() {
               value={preferredTrade}
               onChange={(e) => setPreferredTrade(e.target.value)}
               placeholder="e.g. Noise cancelling headphones, USB-C monitor, open to any books"
-              className="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-4 py-3 text-xs text-zinc-100 placeholder-zinc-650 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+              className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3 text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950"
             />
           </div>
 
           {/* Image Upload */}
           <div>
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-1.5">
+            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1.5">
               Item Image
             </label>
 
             {imagePreview ? (
-              <div className="relative aspect-video rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 max-w-md">
+              <div className="relative aspect-video rounded-xl overflow-hidden border border-zinc-200 bg-zinc-50 max-w-md">
                 <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
                 <button
                   type="button"
@@ -235,16 +235,16 @@ export default function NewItem() {
                     setImageFile(null);
                     setImagePreview(null);
                   }}
-                  className="absolute top-2 right-2 rounded-lg bg-zinc-950/80 px-2 py-1 text-[10px] font-semibold text-red-400 border border-red-500/20 backdrop-blur-sm hover:bg-zinc-900"
+                  className="absolute top-2 right-2 rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-red-650 border border-red-200 shadow-xs hover:bg-red-50 cursor-pointer"
                 >
                   Remove
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 bg-zinc-950/40 rounded-xl p-8 hover:border-zinc-700 cursor-pointer transition-colors max-w-md">
-                <Upload className="h-8 w-8 text-zinc-500 mb-2 stroke-[1.5]" />
-                <span className="text-xs text-zinc-300 font-semibold">Upload item photo</span>
-                <span className="text-[10px] text-zinc-500 mt-1">PNG, JPG, JPEG up to 5MB</span>
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 bg-zinc-50 rounded-xl p-8 hover:bg-zinc-100 hover:border-zinc-300 cursor-pointer transition-all max-w-md">
+                <Upload className="h-8 w-8 text-zinc-400 mb-2 stroke-[1.5]" />
+                <span className="text-xs text-zinc-700 font-semibold">Upload item photo</span>
+                <span className="text-[10px] text-zinc-400 mt-1">PNG, JPG, JPEG up to 5MB</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -258,7 +258,7 @@ export default function NewItem() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-4 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3.5 text-xs font-bold text-white shadow-lg shadow-violet-950/30 hover:from-violet-500 hover:to-indigo-500 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+            className="w-full mt-4 rounded-xl bg-zinc-900 py-3.5 text-xs font-bold text-white shadow-sm hover:bg-zinc-800 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
           >
             {loading && <RefreshCw className="h-3.5 w-3.5 animate-spin" />}
             <span>{loading ? "Publishing Listing..." : "Publish Listing"}</span>

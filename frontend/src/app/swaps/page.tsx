@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { useAuth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import { RefreshCw, MessageSquare, ArrowRightLeft, AlertCircle, Calendar } from "lucide-react";
@@ -53,6 +53,11 @@ export default function SwapsDashboard() {
     if (!user) return;
     setLoading(true);
     setError(null);
+    if (!isSupabaseConfigured) {
+      setError("Supabase credentials are missing. Please define NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your env variables.");
+      setLoading(false);
+      return;
+    }
 
     try {
       // Fetch swaps where user is sender or receiver
@@ -108,8 +113,8 @@ export default function SwapsDashboard() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen bg-zinc-950 flex-col items-center justify-center text-zinc-500 gap-2">
-        <RefreshCw className="h-6 w-6 animate-spin text-violet-500" />
+      <div className="flex min-h-screen bg-zinc-50 flex-col items-center justify-center text-zinc-550 gap-2">
+        <RefreshCw className="h-6 w-6 animate-spin text-zinc-800" />
         <span className="text-xs">Authenticating session...</span>
       </div>
     );
@@ -136,46 +141,46 @@ export default function SwapsDashboard() {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "accepted":
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+        return "bg-emerald-50 text-emerald-700 border-emerald-200";
       case "completed":
-        return "bg-violet-500/10 text-violet-400 border-violet-500/20";
+        return "bg-zinc-900 text-zinc-50 border-zinc-950";
       case "rejected":
-        return "bg-red-500/10 text-red-400 border-red-500/20";
+        return "bg-red-50 text-red-700 border-red-200";
       case "cancelled":
-        return "bg-zinc-550/10 text-zinc-400 border-zinc-500/20";
+        return "bg-zinc-50 text-zinc-500 border-zinc-200";
       default:
-        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+        return "bg-amber-50 text-amber-700 border-amber-200";
     }
   };
 
   const currentList = getFilteredSwaps();
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="flex flex-col min-h-screen bg-zinc-50 text-zinc-900">
       <Navbar />
 
       <main className="flex-1 mx-auto max-w-4xl px-4 py-8 sm:px-6 w-full z-10">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ArrowRightLeft className="h-5.5 w-5.5 text-violet-400" />
+          <h1 className="text-2xl font-bold flex items-center gap-2 text-zinc-900">
+            <ArrowRightLeft className="h-5.5 w-5.5 text-zinc-900" />
             <span>My Swap Requests</span>
           </h1>
-          <p className="text-xs text-zinc-400 mt-1">
+          <p className="text-xs text-zinc-500 mt-1">
             Review and negotiate trade listings with other SwapSphere users.
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-zinc-900 mb-6 gap-6">
+        <div className="flex border-b border-zinc-200 mb-6 gap-6">
           <button
             onClick={() => setActiveTab("incoming")}
             className={`pb-3 text-sm font-semibold border-b-2 transition-all relative ${
-              activeTab === "incoming" ? "border-violet-500 text-violet-400" : "border-transparent text-zinc-500 hover:text-zinc-300"
+              activeTab === "incoming" ? "border-zinc-900 text-zinc-900" : "border-transparent text-zinc-500 hover:text-zinc-800"
             }`}
           >
             Incoming Swaps
             {incomingSwaps.length > 0 && (
-              <span className="absolute -top-1.5 -right-3 px-1.5 py-0.5 rounded-full bg-violet-650 text-[9px] font-bold text-white leading-none">
+              <span className="absolute -top-1.5 -right-3 px-1.5 py-0.5 rounded-full bg-zinc-900 text-[9px] font-bold text-white leading-none">
                 {incomingSwaps.length}
               </span>
             )}
@@ -183,12 +188,12 @@ export default function SwapsDashboard() {
           <button
             onClick={() => setActiveTab("outgoing")}
             className={`pb-3 text-sm font-semibold border-b-2 transition-all relative ${
-              activeTab === "outgoing" ? "border-violet-500 text-violet-400" : "border-transparent text-zinc-500 hover:text-zinc-300"
+              activeTab === "outgoing" ? "border-zinc-900 text-zinc-900" : "border-transparent text-zinc-500 hover:text-zinc-800"
             }`}
           >
             Outgoing Requests
             {outgoingSwaps.length > 0 && (
-              <span className="absolute -top-1.5 -right-3 px-1.5 py-0.5 rounded-full bg-violet-650 text-[9px] font-bold text-white leading-none">
+              <span className="absolute -top-1.5 -right-3 px-1.5 py-0.5 rounded-full bg-zinc-900 text-[9px] font-bold text-white leading-none">
                 {outgoingSwaps.length}
               </span>
             )}
@@ -196,7 +201,7 @@ export default function SwapsDashboard() {
           <button
             onClick={() => setActiveTab("history")}
             className={`pb-3 text-sm font-semibold border-b-2 transition-all ${
-              activeTab === "history" ? "border-violet-500 text-violet-400" : "border-transparent text-zinc-500 hover:text-zinc-300"
+              activeTab === "history" ? "border-zinc-900 text-zinc-900" : "border-transparent text-zinc-500 hover:text-zinc-800"
             }`}
           >
             Past Swaps ({historySwaps.length})
@@ -204,7 +209,7 @@ export default function SwapsDashboard() {
         </div>
 
         {error && (
-          <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-xs text-red-400">
+          <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 p-4 text-xs text-red-650">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -213,13 +218,13 @@ export default function SwapsDashboard() {
         {/* Swap Requests list */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-2 text-zinc-500">
-            <RefreshCw className="h-6 w-6 animate-spin text-violet-500" />
+            <RefreshCw className="h-6 w-6 animate-spin text-zinc-800" />
             <span className="text-xs">Loading requests...</span>
           </div>
         ) : currentList.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-zinc-800 rounded-2xl">
-            <ArrowRightLeft className="h-10 w-10 text-zinc-700 stroke-[1.5] mb-3" />
-            <p className="text-sm font-semibold text-zinc-400">No swap requests</p>
+          <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-zinc-200 rounded-2xl bg-white/50">
+            <ArrowRightLeft className="h-10 w-10 text-zinc-400 stroke-[1.5] mb-3" />
+            <p className="text-sm font-semibold text-zinc-700">No swap requests</p>
             <p className="text-xs text-zinc-500 mt-1 max-w-xs leading-normal">
               {activeTab === "incoming"
                 ? "You haven't received any trade requests yet."
@@ -237,17 +242,17 @@ export default function SwapsDashboard() {
               return (
                 <div
                   key={swap.id}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-zinc-900/20 border border-zinc-800 p-5 rounded-2xl backdrop-blur-md hover:border-zinc-700/80 transition-all"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-white border border-zinc-200 p-5 rounded-2xl shadow-sm hover:border-zinc-300 transition-all"
                 >
                   {/* Items Display */}
                   <div className="flex flex-1 items-center gap-4 min-w-0">
                     {/* Item 1 */}
                     <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                      <div className="h-14 w-14 rounded-lg overflow-hidden bg-zinc-950 border border-zinc-800">
+                      <div className="h-14 w-14 rounded-lg overflow-hidden bg-zinc-50 border border-zinc-200">
                         {swap.sender_item?.image_url ? (
                           <img src={swap.sender_item.image_url} alt={swap.sender_item.title} className="h-full w-full object-cover" />
                         ) : (
-                          <div className="h-full w-full flex items-center justify-center text-[9px] text-zinc-650">No Img</div>
+                          <div className="h-full w-full flex items-center justify-center text-[9px] text-zinc-400">No Img</div>
                         )}
                       </div>
                       <span className="text-[9px] text-zinc-500 font-semibold truncate max-w-[60px]">
@@ -256,17 +261,17 @@ export default function SwapsDashboard() {
                     </div>
 
                     {/* Trade Icon */}
-                    <div className="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full border border-zinc-800 bg-zinc-950">
-                      <ArrowRightLeft className="h-3.5 w-3.5 text-violet-400" />
+                    <div className="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full border border-zinc-200 bg-zinc-50">
+                      <ArrowRightLeft className="h-3.5 w-3.5 text-zinc-950" />
                     </div>
 
                     {/* Item 2 */}
                     <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                      <div className="h-14 w-14 rounded-lg overflow-hidden bg-zinc-950 border border-zinc-800">
+                      <div className="h-14 w-14 rounded-lg overflow-hidden bg-zinc-50 border border-zinc-200">
                         {swap.receiver_item?.image_url ? (
                           <img src={swap.receiver_item.image_url} alt={swap.receiver_item.title} className="h-full w-full object-cover" />
                         ) : (
-                          <div className="h-full w-full flex items-center justify-center text-[9px] text-zinc-650">No Img</div>
+                          <div className="h-full w-full flex items-center justify-center text-[9px] text-zinc-400">No Img</div>
                         )}
                       </div>
                       <span className="text-[9px] text-zinc-500 font-semibold truncate max-w-[60px]">
@@ -276,14 +281,14 @@ export default function SwapsDashboard() {
 
                     {/* Swap summary description */}
                     <div className="ml-2 min-w-0 flex-1">
-                      <p className="text-xs font-semibold text-zinc-200 line-clamp-1">
+                      <p className="text-xs font-semibold text-zinc-800 line-clamp-1">
                         @{partnerProfile.username}'s "{swap.sender_id === user.id ? swap.receiver_item?.title : swap.sender_item?.title}"
                       </p>
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                         <span className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold ${getStatusColor(swap.status)}`}>
                           {swap.status}
                         </span>
-                        <span className="h-1 w-1 rounded-full bg-zinc-850" />
+                        <span className="h-1 w-1 rounded-full bg-zinc-200" />
                         <span className="text-[10px] text-zinc-500 flex items-center gap-1">
                           <Calendar className="h-3.5 w-3.5" />
                           {new Date(swap.created_at).toLocaleDateString()}
@@ -296,7 +301,7 @@ export default function SwapsDashboard() {
                   <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-3 flex-shrink-0">
                     <Link
                       href={`/swaps/${swap.id}`}
-                      className="flex items-center gap-1.5 text-xs font-semibold bg-violet-650 text-white px-4 py-2.5 rounded-xl hover:bg-violet-550 shadow-md shadow-violet-950/20 transition-all"
+                      className="flex items-center gap-1.5 text-xs font-semibold bg-zinc-900 text-white px-4 py-2.5 rounded-xl hover:bg-zinc-800 shadow-sm transition-all cursor-pointer"
                     >
                       <MessageSquare className="h-3.5 w-3.5" />
                       <span>Negotiate & Chat</span>

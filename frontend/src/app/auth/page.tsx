@@ -14,7 +14,7 @@ function AuthContent() {
     <div className="flex flex-col items-center">
       <Link
         href="/"
-        className="inline-flex items-center gap-1.5 text-xs text-zinc-550 hover:text-zinc-300 transition-colors mb-6"
+        className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 transition-colors mb-6"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         Back to Home
@@ -30,9 +30,9 @@ function AuthContent() {
 
 export default function AuthPage() {
   return (
-    <div className="flex min-h-screen bg-zinc-950 items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-violet-600/10 rounded-full blur-[100px] pointer-events-none" />
-      <Suspense fallback={<div className="text-xs text-zinc-550">Loading Auth...</div>}>
+    <div className="flex min-h-screen bg-zinc-50 items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-zinc-900/5 rounded-full blur-[100px] pointer-events-none" />
+      <Suspense fallback={<div className="text-xs text-zinc-500">Loading Auth...</div>}>
         <AuthContent />
       </Suspense>
     </div>

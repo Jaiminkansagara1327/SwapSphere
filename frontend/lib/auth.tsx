@@ -1,14 +1,37 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import { useUser, useAuth as useClerkAuth } from "@clerk/nextjs";
+import { supabase } from "./supabaseClient";
 
 export function useAuth() {
   const { user, isLoaded } = useUser();
   const { signOut } = useClerkAuth();
 
-  return {
-    user: user ? { id: user.id, email: user.primaryEmailAddress?.emailAddress } : null,
-    profile: user
+  useEffect(() => {
+    if (user) {
+      const syncProfile = async () => {
+        try {
+          await supabase.from("profiles").upsert({
+            id: user.id,
+            username: user.username || user.firstName || "user",
+            full_name: user.fullName || null,
+            avatar_url: user.imageUrl || null,
+          });
+        } catch (err) {
+          console.error("Error syncing profile to Supabase:", err);
+        }
+      };
+      syncProfile();
+    }
+  }, [user]);
+
+  const memoizedUser = useMemo(() => {
+    return user ? { id: user.id, email: user.primaryEmailAddress?.emailAddress } : null;
+  }, [user]);
+
+  const memoizedProfile = useMemo(() => {
+    return user
       ? {
           id: user.id,
           username: user.username || user.firstName || "user",
@@ -16,7 +39,12 @@ export function useAuth() {
           avatar_url: user.imageUrl || null,
           updated_at: user.updatedAt ? new Date(user.updatedAt).toISOString() : null,
         }
-      : null,
+      : null;
+  }, [user]);
+
+  return {
+    user: memoizedUser,
+    profile: memoizedProfile,
     loading: !isLoaded,
     signOut: async () => {
       await signOut();
