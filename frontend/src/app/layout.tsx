@@ -14,15 +14,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className="h-full antialiased"
-    >
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-zinc-50 text-zinc-900">
         <ClerkProvider>
           <HideClerkKeyless />
           {children}
         </ClerkProvider>
+        {/* Suppress Clerk debug network errors from polluting the dev overlay */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              var origError = console.error;
+              console.error = function() {
+                var msg = arguments[0];
+                if (typeof msg === 'string' && msg.includes('[Clerk Debug]')) return;
+                origError.apply(console, arguments);
+              };
+            })();
+          `
+        }} />
       </body>
     </html>
   );

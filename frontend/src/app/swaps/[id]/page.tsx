@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import ChatWindow from "@/components/ChatWindow";
 import { RefreshCw, AlertCircle, ArrowLeft, Check, X, ShieldAlert, Sparkles } from "lucide-react";
+import EscrowPanel from "@/components/EscrowPanel";
 import Link from "next/link";
 
 interface Profile {
@@ -22,6 +23,9 @@ interface ItemDetails {
   image_url: string | null;
   category: string;
   condition: string;
+  is_coupon: boolean;
+  coupon_code: string | null;
+  coupon_expiry: string | null;
 }
 
 interface SwapRequest {
@@ -91,7 +95,10 @@ export default function SwapNegotiation({ params }: PageProps) {
             description,
             image_url,
             category,
-            condition
+            condition,
+            is_coupon,
+            coupon_code,
+            coupon_expiry
           ),
           receiver_item: items!swap_requests_receiver_item_id_fkey (
             id,
@@ -99,7 +106,10 @@ export default function SwapNegotiation({ params }: PageProps) {
             description,
             image_url,
             category,
-            condition
+            condition,
+            is_coupon,
+            coupon_code,
+            coupon_expiry
           )
         `)
         .eq("id", id)
@@ -340,17 +350,19 @@ export default function SwapNegotiation({ params }: PageProps) {
                 )
               ) : swap.status === "Accepted" ? (
                 <div className="space-y-4">
-                  <div className="flex items-start gap-2.5 rounded-lg border border-emerald-250 bg-emerald-50/50 p-3 text-xs text-emerald-800 leading-relaxed">
+                  <div className="flex items-start gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50/50 p-3 text-xs text-emerald-800 leading-relaxed">
                     <Check className="h-5 w-5 flex-shrink-0" />
                     <span>
-                      This swap has been accepted by both parties! Chat to arrange a safe physical hand-off. Once you have exchanged items, mark the trade as Completed.
+                      This swap has been accepted! {swap.sender_item?.is_coupon || swap.receiver_item?.is_coupon
+                        ? "Both parties must deposit their coupon codes into escrow below before completing the trade."
+                        : "Chat to arrange a safe physical hand-off. Once you have exchanged items, mark the trade as Completed."}
                     </span>
                   </div>
                   <button
                     onClick={() => handleUpdateStatus("Completed")}
                     className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 py-3.5 text-xs font-bold shadow-sm transition-all cursor-pointer"
                   >
-                    <span>Complete Exchange & Trade</span>
+                    <span>Complete Exchange &amp; Trade</span>
                   </button>
                 </div>
               ) : (
@@ -369,6 +381,27 @@ export default function SwapNegotiation({ params }: PageProps) {
             <ChatWindow swapRequestId={swap.id} />
           </div>
         </div>
+
+        {/* Escrow Panel — shown only when swap is Accepted and at least one item is a coupon */}
+        {swap.status === "Accepted" && (swap.sender_item?.is_coupon || swap.receiver_item?.is_coupon) && (
+          <div className="mt-8">
+            <EscrowPanel
+              swapRequestId={swap.id}
+              senderId={swap.sender_id}
+              receiverId={swap.receiver_id}
+              senderItemId={swap.sender_item_id}
+              receiverItemId={swap.receiver_item_id}
+              senderItemTitle={swap.sender_item?.title || ""}
+              receiverItemTitle={swap.receiver_item?.title || ""}
+              senderIsCoupon={!!swap.sender_item?.is_coupon}
+              receiverIsCoupon={!!swap.receiver_item?.is_coupon}
+              senderCouponCode={swap.sender_item?.coupon_code}
+              receiverCouponCode={swap.receiver_item?.coupon_code}
+              senderCouponExpiry={swap.sender_item?.coupon_expiry}
+              receiverCouponExpiry={swap.receiver_item?.coupon_expiry}
+            />
+          </div>
+        )}
       </main>
     </div>
   );

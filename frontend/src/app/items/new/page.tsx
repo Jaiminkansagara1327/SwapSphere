@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
-import { PlusCircle, Upload, AlertCircle, RefreshCw, ArrowLeft } from "lucide-react";
+import { PlusCircle, Upload, AlertCircle, RefreshCw, ArrowLeft, Ticket, ToggleLeft, ToggleRight, Info } from "lucide-react";
 import Link from "next/link";
 
 const CATEGORIES = ["Electronics", "Books", "Fashion", "Home", "Games", "Sports", "Other"];
@@ -25,6 +25,10 @@ export default function NewItem() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Coupon-specific state (now mandatory)
+  const [couponCode, setCouponCode] = useState("");
+  const [couponExpiry, setCouponExpiry] = useState("");
+
   // Authentication guard
   useEffect(() => {
     if (!authLoading && !user) {
@@ -40,12 +44,34 @@ export default function NewItem() {
     }
   };
 
+  // Validate coupon expiry is in the future
+  const isCouponValid = (): boolean => {
+    if (!couponCode.trim()) {
+      setError("Please enter the coupon code.");
+      return false;
+    }
+    if (!couponExpiry) {
+      setError("Please enter the coupon expiry date.");
+      return false;
+    }
+    const expiry = new Date(couponExpiry);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (expiry <= today) {
+      setError("Coupon expiry date must be in the future. Expired coupons cannot be listed.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || loading) return;
 
-    setLoading(true);
     setError(null);
+    if (!isCouponValid()) return;
+
+    setLoading(true);
 
     try {
       let imageUrl = null;
@@ -67,7 +93,6 @@ export default function NewItem() {
           throw new Error("Failed to upload image: " + uploadError.message);
         }
 
-        // Get public URL
         const { data } = supabase.storage.from("item-images").getPublicUrl(filePath);
         imageUrl = data.publicUrl;
       }
@@ -82,6 +107,10 @@ export default function NewItem() {
         image_url: imageUrl,
         preferred_trade: preferredTrade.trim() || null,
         status: "Available",
+        // Coupon fields — now mandatory for all listings
+        is_coupon: true,
+        coupon_code: couponCode.trim().toUpperCase(),
+        coupon_expiry: couponExpiry,
       });
 
       if (insertError) throw insertError;
@@ -106,6 +135,11 @@ export default function NewItem() {
 
   if (!user) return null;
 
+  // Compute min date for expiry picker (tomorrow)
+  const minExpiry = new Date();
+  minExpiry.setDate(minExpiry.getDate() + 1);
+  const minExpiryStr = minExpiry.toISOString().split("T")[0];
+
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 text-zinc-900">
       <Navbar />
@@ -124,15 +158,15 @@ export default function NewItem() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold flex items-center gap-2 text-zinc-900">
             <PlusCircle className="h-5.5 w-5.5 text-zinc-900" />
-            <span>List an Item for Swap</span>
+            <span>List a Coupon for Swap</span>
           </h1>
           <p className="text-xs text-zinc-500 mt-1">
-            Fill in the details below to upload a item and put it in the SwapSphere marketplace.
+            Fill in the details below to upload a coupon and put it in the SwapSphere marketplace.
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 p-4 text-xs text-red-650">
+          <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 p-4 text-xs text-red-700">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -140,17 +174,60 @@ export default function NewItem() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-zinc-200 p-6 rounded-2xl shadow-sm">
+
+          <div className="space-y-4 border border-emerald-200 bg-emerald-50/50 rounded-xl p-4">
+            <div className="flex items-start gap-2 text-[10px] text-emerald-700 font-medium">
+              <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+              <span>
+                Your coupon code is stored securely and will only be shared with the other party through the
+                escrow system once both sides have accepted and deposited their codes.
+              </span>
+            </div>
+
+            {/* Coupon Code */}
+            <div>
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">
+                Coupon Code <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                placeholder="e.g. SAVE50, FLAT200OFF, SUMMER25"
+                className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3 text-xs font-mono text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 uppercase"
+                style={{ textTransform: "uppercase" }}
+              />
+            </div>
+
+            {/* Expiry Date */}
+            <div>
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">
+                Expiry Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                required
+                value={couponExpiry}
+                min={minExpiryStr}
+                onChange={(e) => setCouponExpiry(e.target.value)}
+                className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3 text-xs text-zinc-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              />
+              <p className="text-[10px] text-zinc-400 mt-1">Only future-dated coupons can be listed. Expired coupons will be rejected.</p>
+            </div>
+          </div>
+
           {/* Title */}
           <div>
             <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">
-              Item Title
+              Coupon / Deal Name
             </label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Mechanical Keyboard, Introduction to Algorithms Book"
+              placeholder="e.g. Flat 50% Off Powerbank, BookMyShow ₹200 Off"
               className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3 text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950"
             />
           </div>
@@ -201,7 +278,7 @@ export default function NewItem() {
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe the item's features, usability, and any potential wear and tear."
+              placeholder="Describe the coupon — what brand/platform, what discount, any restrictions or T&C."
               className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3.5 text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 resize-none"
             />
           </div>
@@ -215,7 +292,7 @@ export default function NewItem() {
               type="text"
               value={preferredTrade}
               onChange={(e) => setPreferredTrade(e.target.value)}
-              placeholder="e.g. Noise cancelling headphones, USB-C monitor, open to any books"
+              placeholder="e.g. Swiggy coupon, Zomato discount, any food delivery coupon"
               className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3 text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950"
             />
           </div>
@@ -223,7 +300,7 @@ export default function NewItem() {
           {/* Image Upload */}
           <div>
             <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1.5">
-              Item Image
+              Coupon Screenshot / Brand Logo (Optional)
             </label>
 
             {imagePreview ? (
@@ -235,7 +312,7 @@ export default function NewItem() {
                     setImageFile(null);
                     setImagePreview(null);
                   }}
-                  className="absolute top-2 right-2 rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-red-650 border border-red-200 shadow-xs hover:bg-red-50 cursor-pointer"
+                  className="absolute top-2 right-2 rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-red-700 border border-red-200 shadow-xs hover:bg-red-50 cursor-pointer"
                 >
                   Remove
                 </button>
@@ -243,7 +320,7 @@ export default function NewItem() {
             ) : (
               <label className="flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 bg-zinc-50 rounded-xl p-8 hover:bg-zinc-100 hover:border-zinc-300 cursor-pointer transition-all max-w-md">
                 <Upload className="h-8 w-8 text-zinc-400 mb-2 stroke-[1.5]" />
-                <span className="text-xs text-zinc-700 font-semibold">Upload item photo</span>
+                <span className="text-xs text-zinc-700 font-semibold">Upload photo</span>
                 <span className="text-[10px] text-zinc-400 mt-1">PNG, JPG, JPEG up to 5MB</span>
                 <input
                   type="file"
