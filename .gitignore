@@ -1,9 +1,15 @@
-# Python / Django
+# Python
 backend/venv/
+.venv/
+venv/
 __pycache__/
 *.py[cod]
 *$py.class
 *.sqlite3
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
 
 # Environment variables
 .env

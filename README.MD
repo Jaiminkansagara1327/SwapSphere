@@ -56,6 +56,8 @@ MongoDB
 
 ## ⚡ Getting Started
 
+### 1. Frontend & API Setup
+
 ```bash
 git clone https://github.com/Jaiminkansagara1327/SwapSphere.git
 cd SwapSphere/frontend
@@ -64,6 +66,22 @@ npm run dev
 ```
 
 Create your `.env` file with the required database and Clerk credentials before running the application.
+
+### 2. Running Pytest Suite
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+pytest -v --cov=tests
+```
+
+## 🧪 Automated Testing & CI
+
+SwapSphere uses **Pytest** for business logic, validation, escrow rules, and API contract testing, automated via **GitHub Actions** (`.github/workflows/ci.yml`):
+
+* 🧪 **Pytest Suite:** 50+ unit and integration tests covering object ID parsing, escrow state machines, price bounds, swap lifecycles, and admin permissions.
+* 🤖 **Continuous Integration:** Matrix testing across Python 3.11 & 3.12, plus automated ESLint & Prisma validation on all pushes and pull requests.
 
 ## 📌 Project Goal
 
